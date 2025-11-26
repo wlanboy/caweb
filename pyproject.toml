@@ -1,0 +1,13 @@
+[project]
+name = "caweb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=46.0.3",
+    "fastapi>=0.122.0",
+    "jinja2>=3.1.6",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.38.0",
+]

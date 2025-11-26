@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Neues Zertifikat{% endblock %}
+{% block content %}
+  <h2>Zertifikat erstellen</h2>
+  <form method="post">
+    <label>Hostname:
+      <input type="text" name="hostname" required>
+    </label>
+    <label>Alternative Namen (Komma-getrennt):
+      <input type="text" name="alt_names">
+    </label>
+    <button type="submit">Erstellen</button>
+  </form>
+
+  {% if hostname %}
+    <h3>Ergebnis für {{ hostname }}</h3>
+    <h4>Certificate</h4>
+    <pre>{{ cert_content }}</pre>
+    <h4>Private Key</h4>
+    <pre>{{ key_content }}</pre>
+  {% endif %}
+{% endblock %}

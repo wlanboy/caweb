@@ -5,3 +5,7 @@ image:
   tag: latest
 service:
   port: 2000
+pvc:
+  name: caweb-data-pvc
+  size: 10Mi
+  mountPath: /data

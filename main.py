@@ -17,6 +17,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 CERT_DIR = Path(os.getenv("LOCAL_CA_PATH", "/local-ca"))
+FILE_DIR = Path(os.getenv("LOCAL_CA_PATH", "/data"))
 CA_CERT = CERT_DIR / "ca.pem"
 CA_KEY = CERT_DIR / "ca.key"
 
@@ -73,7 +74,7 @@ async def create_cert(request: Request, hostname: str = Form(...), alt_names: st
         .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
 
-    cert_path = host_dir / f"{hostname}.crt"
+    cert_path = FILE_DIR / f"{hostname}.crt"
     with open(cert_path, "wb") as f:
         f.write(cert.public_bytes(serialization.Encoding.PEM))
 
@@ -94,5 +95,5 @@ async def create_cert(request: Request, hostname: str = Form(...), alt_names: st
 
 @app.get("/download/{hostname}/{filename}")
 async def download_file(hostname: str, filename: str):
-    full_path = CERT_DIR / hostname / filename
+    full_path = FILE_DIR / hostname / filename
     return FileResponse(full_path, filename=filename)

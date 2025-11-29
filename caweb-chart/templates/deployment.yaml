@@ -22,7 +22,12 @@ spec:
             - name: caweb-secret
               mountPath: /local-ca
               readOnly: true
+            - name: caweb-data
+              mountPath: {{ .Values.pvc.mountPath }}
       volumes:
         - name: caweb-secret
           secret:
             secretName: ca-secret
+        - name: caweb-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvc.name }}

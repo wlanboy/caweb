@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 2000
 
 #CMD ["python", "main.py"]
-CMD ["uvicorn", "--listen=0.0.0.0:2000", "main:app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "2000"]

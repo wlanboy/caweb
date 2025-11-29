@@ -5,6 +5,3 @@ image:
   tag: latest
 service:
   port: 2000
-volume:
-  mountPath: /local-ca
-  claimName: caweb-pvc

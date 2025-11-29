@@ -19,9 +19,10 @@ spec:
           ports:
             - containerPort: {{ .Values.service.port }}
           volumeMounts:
-            - name: caweb-storage
-              mountPath: {{ .Values.volume.mountPath }}
+            - name: caweb-secret
+              mountPath: /local-ca
+              readOnly: true
       volumes:
-        - name: caweb-storage
-          persistentVolumeClaim:
-            claimName: {{ .Values.volume.claimName }}
+        - name: caweb-secret
+          secret:
+            secretName: ca-secret

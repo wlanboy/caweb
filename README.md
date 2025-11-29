@@ -66,7 +66,7 @@ docker run --rm -p 2000:2000 -v /local-ca:/local-ca caweb
 Run detached (long-running service):
 
 ```sh
-docker run --name caweb -d -p 2000:2000 -v /local-ca:/local-ca --restart unless-stopped caweb
+docker run --name caweb -d -p 2000:2000 -v /local-ca:/local-ca -v /local-ca/data:/data --restart unless-stopped caweb
 ```
 
 Notes:

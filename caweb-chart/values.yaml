@@ -1,0 +1,7 @@
+namespace: tester
+name: caweb
+image:
+  repository: wlanboy/caweb
+  tag: latest
+service:
+  port: 2000

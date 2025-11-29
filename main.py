@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 CERT_DIR = Path(os.getenv("LOCAL_CA_PATH", "/local-ca"))
-FILE_DIR = Path(os.getenv("LOCAL_CA_PATH", "/data"))
+FILE_DIR = Path(os.getenv("LOCAL_DATA_PATH", "/data"))
 CA_CERT = CERT_DIR / "ca.pem"
 CA_KEY = CERT_DIR / "ca.key"
 
@@ -28,7 +28,7 @@ async def form(request: Request):
 @app.post("/", response_class=HTMLResponse)
 async def create_cert(request: Request, hostname: str = Form(...), alt_names: str = Form("")):
     alt_names_list = [n.strip() for n in alt_names.split(",") if n.strip()]
-    host_dir = CERT_DIR / hostname
+    host_dir = FILE_DIR / hostname
     host_dir.mkdir(parents=True, exist_ok=True)
 
     # Schlüssel generieren
@@ -74,7 +74,7 @@ async def create_cert(request: Request, hostname: str = Form(...), alt_names: st
         .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
 
-    cert_path = FILE_DIR / f"{hostname}.crt"
+    cert_path = host_dir / f"{hostname}.crt"
     with open(cert_path, "wb") as f:
         f.write(cert.public_bytes(serialization.Encoding.PEM))
 

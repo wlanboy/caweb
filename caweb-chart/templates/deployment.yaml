@@ -18,3 +18,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.service.port }}
+          volumeMounts:
+            - name: caweb-storage
+              mountPath: {{ .Values.volume.mountPath }}
+      volumes:
+        - name: caweb-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.claimName }}

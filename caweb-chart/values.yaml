@@ -1,4 +1,4 @@
-namespace: tester
+namespace: caweb
 name: caweb
 image:
   repository: wlanboy/caweb

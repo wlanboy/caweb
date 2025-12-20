@@ -6,6 +6,7 @@ metadata:
 spec:
   hosts:
     - {{ .Values.name }}.tp.lan
+    - {{ .Values.name }}.gmk.lan
   exportTo:
   - "."
   - istio-ingress

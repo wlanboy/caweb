@@ -13,3 +13,4 @@ spec:
         protocol: HTTP
       hosts:
         - {{ .Values.name }}.tp.lan
+        - {{ .Values.name }}.gmk.lan

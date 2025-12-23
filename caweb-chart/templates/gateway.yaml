@@ -14,3 +14,15 @@ spec:
       hosts:
         - {{ .Values.name }}.tp.lan
         - {{ .Values.name }}.gmk.lan
+    {{- if .Values.certmanager.enabled }}
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - {{ .Values.name }}.tp.lan
+        - {{ .Values.name }}.gmk.lan
+      tls:
+        mode: SIMPLE
+        credentialName: {{ .Values.certmanager.secretName }}
+    {{- end }}

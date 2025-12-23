@@ -9,3 +9,10 @@ pvc:
   name: caweb-data-pvc
   size: 10Mi
   mountPath: /data
+
+certmanager:
+  enabled: true
+  issuer: local-ca-issuer
+  kind: ClusterIssuer
+  secretName: caweb-tls
+  

@@ -10,6 +10,8 @@ pvc:
   size: 10Mi
   mountPath: /data
 
+gateWayNamespace: istio-ingress
+
 certmanager:
   enabled: true
   issuer: local-ca-issuer

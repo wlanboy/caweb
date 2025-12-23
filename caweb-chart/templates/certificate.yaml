@@ -1,9 +1,9 @@
-{{- if .Values.certManager.enabled }}
+{{- if .Values.certmanager.enabled }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .Values.certmanager.secretName }}
-  namespace: {{ .Values.istio.gatewayNamespace}}
+  namespace: {{ .Values.gatewayNamespace}}
 spec:
   secretName: {{ .Values.certmanager.secretName }}
   issuerRef:

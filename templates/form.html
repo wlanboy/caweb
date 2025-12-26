@@ -53,3 +53,57 @@
 <pre>{{ key_content }}</pre>
 {% endif %}
 {% endblock %}
+
+{% block ca_content %}
+{% if ca_exists %}
+
+<div class="ca-collapsible-container">
+
+  <!-- Checkbox steuert das Auf-/Zuklappen -->
+  <input type="checkbox" id="ca-toggle" class="ca-checkbox">
+
+  <!-- Label ist der sichtbare Button -->
+  <label for="ca-toggle" class="ca-toggle">
+    <span class="ca-toggle-icon">⚠️</span>
+    <span class="ca-toggle-text">Hinweise zur Installation der CA anzeigen</span>
+  </label>
+
+  <!-- Der einklappbare Bereich -->
+  <div class="ca-info">
+    <div class="ca-download-box">
+      <h3>CA herunterladen</h3>
+
+      <a href="/download-ca/ca.pem" class="ca-download-button">CA Zertifikat herunterladen</a>
+      <a href="/download-ca/ca.key" class="ca-download-button">CA Private Key herunterladen</a>
+
+      <div class="ca-install-hint">
+        <h4>Installation der CA</h4>
+        <p>Damit Zertifikate als vertrauenswürdig gelten, muss die CA im System installiert werden.</p>
+
+        <h5>Linux (Debian/Ubuntu)</h5>
+        <pre>sudo cp ca.pem /usr/local/share/ca-certificates/homelab-ca.crt
+sudo update-ca-certificates</pre>
+
+        <h5>Linux (RHEL/CentOS/Fedora)</h5>
+        <pre>sudo cp ca.pem /etc/pki/ca-trust/source/anchors/homelab-ca.crt
+sudo update-ca-trust</pre>
+
+        <h5>macOS</h5>
+        <pre>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.pem</pre>
+
+        <h5>Windows</h5>
+        <p>
+          1. „ca.pem“ doppelklicken<br>
+          2. „Zertifikat installieren“ wählen<br>
+          3. „Lokaler Computer“ auswählen<br>
+          4. In „Vertrauenswürdige Stammzertifizierungsstellen“ installieren
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endif %}
+{% endblock %}
+

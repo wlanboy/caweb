@@ -1,22 +1,55 @@
 {% extends "base.html" %}
+
 {% block title %}Neues Zertifikat{% endblock %}
 {% block content %}
-  <h2>Zertifikat erstellen</h2>
-  <form method="post">
-    <label>Hostname:
-      <input type="text" name="hostname" required>
-    </label>
-    <label>Alternative Namen (Komma-getrennt):
-      <input type="text" name="alt_names">
-    </label>
-    <button type="submit">Erstellen</button>
-  </form>
 
-  {% if hostname %}
-    <h3>Ergebnis für {{ hostname }}</h3>
-    <h4>Certificate</h4>
-    <pre>{{ cert_content }}</pre>
-    <h4>Private Key</h4>
-    <pre>{{ key_content }}</pre>
-  {% endif %}
+{% if not ca_exists %}
+<div class="ca-warning">
+  <p><strong>Es wurde keine CA gefunden.</strong></p>
+  <form method="post" action="/create-ca">
+    <label>CA-Schlüsseltyp: 
+      <select name="ca_key_type" class="select">
+        <option value="rsa">RSA 4096</option>
+        <option value="secp256r1">ECC SECP256R1</option>
+        <option value="secp521r1">ECC SECP521R1</option>
+      </select>
+    </label>
+    <button type="submit" class="ca-button">CA erstellen</button>
+  </form>
+</div>
+{% endif %}
+
+{% if ca_created %}
+<div class="ca-success">
+  <p><strong>CA erfolgreich erstellt!</strong></p>
+</div>
+{% endif %}
+
+<h2>Zertifikat erstellen</h2>
+<form method="post" action="/">
+  <label>Hostname:
+    <input type="text" name="hostname" required>
+  </label>
+  <label>Alternative Namen (Komma-getrennt):
+    <input type="text" name="alt_names">
+  </label>
+
+  <label>Zertifikat-Schlüsseltyp:
+    <select name="cert_key_type" class="select">
+      <option value="rsa">RSA 4096</option>
+      <option value="secp256r1">ECC SECP256R1</option>
+      <option value="secp521r1">ECC SECP521R1</option>
+    </select>
+  </label>
+
+  <button type="submit">Erstellen</button>
+</form>
+
+{% if hostname %}
+<h3>Ergebnis für {{ hostname }}</h3>
+<h4>Certificate</h4>
+<pre>{{ cert_content }}</pre>
+<h4>Private Key</h4>
+<pre>{{ key_content }}</pre>
+{% endif %}
 {% endblock %}

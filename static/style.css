@@ -105,3 +105,92 @@ pre {
   border-radius: 4px;
   font-size: 1em;
 }
+
+/* Container */
+.ca-collapsible-container {
+  margin-top: 2em;
+}
+
+/* Versteckte Checkbox */
+.ca-checkbox {
+  display: none;
+}
+
+/* Toggle Button */
+.ca-toggle {
+  background-color: #2a2a3d;
+  padding: 0.8em;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #ff9f43;
+  transition: background-color 0.2s ease;
+}
+
+.ca-toggle:hover {
+  background-color: #34344a;
+}
+
+.ca-toggle-icon {
+  font-size: 1.4em;
+  margin-right: 0.5em;
+}
+
+.ca-toggle-text {
+  font-weight: bold;
+  color: #ff9f43;
+}
+
+.ca-info {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.ca-checkbox:checked ~ .ca-info {
+  max-height: 2000px;
+}
+
+.ca-download-box {
+  background-color: #2a2a3d;
+  padding: 1em;
+  border-radius: 8px;
+  margin-top: 1em;
+}
+
+.ca-download-button {
+  display: inline-block;
+  background-color: #ff9f43;
+  color: #1e1e2f;
+  padding: 0.6em 1em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 1em;
+  margin-top: 0.5em;
+}
+
+.ca-download-button:hover {
+  background-color: #e68a2f;
+}
+
+.ca-install-hint {
+  margin-top: 1.5em;
+  background-color: #1e1e2f;
+  padding: 1em;
+  border-radius: 6px;
+}
+
+.ca-install-hint h4, .ca-install-hint h5 {
+  margin-top: 1em;
+  color: #ff9f43;
+}
+
+.ca-install-hint pre {
+  background-color: #2a2a3d;
+  padding: 0.8em;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+

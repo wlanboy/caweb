@@ -85,6 +85,24 @@ async def create_cert(request: Request, hostname: str = Form(...), alt_names: st
         encryption_algorithm=serialization.NoEncryption()
     ).decode()
 
+    key_path = host_dir / f"{hostname}.key"
+    with open(key_path, "wb") as f:
+        f.write(key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        ))
+
+    # Kombinierte PEM-Datei (Key + Zertifikat)
+    combined_path = host_dir / f"{hostname}.pem"
+    with open(combined_path, "wb") as f:
+        f.write(key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        ))
+        f.write(cert.public_bytes(serialization.Encoding.PEM))
+
     # Ergebnis direkt unter dem Formular anzeigen
     return templates.TemplateResponse("form.html", {
         "request": request,

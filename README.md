@@ -8,6 +8,16 @@ A tiny certificate authority (CA) web UI for issuing and managing certificates. 
 - Run locally using the provided `uv` wrapper commands
 - Build and run using Docker for deployment or sandboxed testing
 
+## steps
+Create ca
+![CA creation](./screenshots/cacreate.png)
+
+Create certificates
+![CA website](./screenshots/caweb.png)
+
+Install CA
+![CA install](./screenshots/cainstall.png)
+
 ## Requirements
 
 - Python 3.11+ (or the version used in your environment)

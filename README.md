@@ -73,10 +73,12 @@ Run interactively (temporary container):
 docker run --rm -p 2000:2000 -v /local-ca:/local-ca caweb
 ```
 
-Run detached (long-running service):
+Run detached (long-running service) with dockerhub image:
 
 ```sh
-docker run --name caweb -d -p 2000:2000 -v /local-ca:/local-ca -v /local-ca/data:/data --restart unless-stopped caweb
+docker run --name caweb -d -p 2000:2000 \
+    -v /local-ca:/local-ca -v /local-ca/data:/data \
+    --restart unless-stopped wlanboy/caweb:latest
 ```
 
 Notes:

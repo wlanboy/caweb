@@ -152,12 +152,18 @@ async def create_cert(
         },
     )
 
-
 @app.get("/download/{hostname}/{filename}")
 async def download_file(hostname: str, filename: str):
     full_path = FILE_DIR / hostname / filename
     return FileResponse(full_path, filename=filename)
 
+@app.get("/download-ca/{filename}")
+async def download_ca(filename: str):
+    if filename == "ca.key":
+        return HTMLResponse("Der private CA-Schlüssel kann nicht heruntergeladen werden.", status_code=403)
+
+    full_path = CERT_DIR / filename
+    return FileResponse(full_path, filename=filename)
 
 @app.post("/create-ca", response_class=HTMLResponse)
 async def create_ca(request: Request, ca_key_type: str = Form(...)):

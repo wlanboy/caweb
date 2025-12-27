@@ -1,4 +1,7 @@
-## create secret
+# helm chart to deploy caweb
+Needs a secret for the ca. Create secret befor deploying the helm chart.
+
+## needed secret beforhand
 ```bash
 kubectl create secret generic ca-secret \
   --from-file=ca.pem=/local-ca/ca.pem \

@@ -72,6 +72,7 @@
 
   <!-- Der einklappbare Bereich -->
   <div class="ca-info">
+
     <div class="ca-download-box">
       <h3>CA herunterladen</h3>
 
@@ -92,6 +93,22 @@ sudo update-ca-trust</pre>
         <h5>macOS</h5>
         <pre>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.pem</pre>
 
+        <h5>Android</h5>
+        <p>
+          1. „ca.pem“ auf das Gerät kopieren (ggf. in .crt umbenennen)<br>
+          2. Einstellungen &rarr; Sicherheit &rarr; Verschlüsselung & Anmeldedaten<br>
+          3. „CA-Zertifikat“ (oder „Von Speicher installieren“) wählen<br>
+          4. Warnung bestätigen und Datei auswählen
+        </p>
+
+        <h5>iOS (iPhone/iPad)</h5>
+        <p>
+          1. „ca.pem“ via AirDrop oder iCloud öffnen und „Laden“ erlauben<br>
+          2. Einstellungen &rarr; Profil geladen &rarr; Installieren<br>
+          3. Einstellungen &rarr; Allgemein &rarr; Info &rarr; Zertifikatsvertrauenseinstellungen<br>
+          4. Schalter für die neue CA unter „Volles Vertrauen für Root-Zertifikate“ aktivieren
+        </p>
+
         <h5>Windows</h5>
         <p>
           1. „ca.pem“ doppelklicken<br>
@@ -99,11 +116,13 @@ sudo update-ca-trust</pre>
           3. „Lokaler Computer“ auswählen<br>
           4. In „Vertrauenswürdige Stammzertifizierungsstellen“ installieren
         </p>
-      </div>
-    </div>
-  </div>
+      </div><!--ca-install-hint-->
 
-</div>
+    </div><!--ca-download-box-->
+
+  </div><!--ca-info-->
+
+</div> <!--ca-collapsible-container-->
 
 {% endif %}
 {% endblock %}

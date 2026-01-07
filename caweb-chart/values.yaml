@@ -10,6 +10,7 @@ pvc:
   name: caweb-data-pvc
   size: 10Mi
   mountPath: /data
+  storageClassName: "local-path"
 
 gateWayNamespace: istio-ingress
 

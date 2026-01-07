@@ -16,11 +16,8 @@ spec:
     - {{ .Values.name }}-gateway
     - mesh
   http:
-    - match:
-        - uri:
-            prefix: /
-      route:
+    - route:
         - destination:
-            host: {{ .Values.name }}.{{ .Values.namespace }}.svc.cluster.local
+            host: {{ .Values.name }}-svc
             port:
               number: {{ .Values.service.port }}

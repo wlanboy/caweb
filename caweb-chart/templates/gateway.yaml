@@ -12,17 +12,19 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-      {{- range .Values.hosts }}
+        {{- range .Values.hosts }}
         - {{ . }}
-      {{- end }}
+        {{- end }}
+
     {{- if .Values.certmanager.enabled }}
     - port:
         number: 443
         name: https
         protocol: HTTPS
-      {{- range .Values.hosts }}
+      hosts:
+        {{- range .Values.hosts }}
         - {{ . }}
-      {{- end }}
+        {{- end }}
       tls:
         mode: SIMPLE
         credentialName: {{ .Values.certmanager.secretName }}

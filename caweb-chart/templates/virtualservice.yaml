@@ -5,8 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   hosts:
-    - {{ .Values.name }}.tp.lan
-    - {{ .Values.name }}.gmk.lan
+  {{- range .Values.hosts }}
+    - {{ . }}
+  {{- end }}
   exportTo:
   - "."
   - istio-ingress

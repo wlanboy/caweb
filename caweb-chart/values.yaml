@@ -3,6 +3,7 @@ name: caweb
 image:
   repository: wlanboy/caweb
   tag: latest
+  pullPolicy: Always
 service:
   port: 2000
 pvc:
@@ -12,9 +13,12 @@ pvc:
 
 gateWayNamespace: istio-ingress
 
+hosts: 
+  - caweb.tp.lan
+  - caweb.gmk.lan
+
 certmanager:
   enabled: true
   issuer: local-ca-issuer
   kind: ClusterIssuer
   secretName: caweb-tls
-  

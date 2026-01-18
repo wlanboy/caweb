@@ -7,12 +7,11 @@
 <div class="ca-warning">
   <p><strong>Es wurde keine CA gefunden.</strong></p>
   <form method="post" action="/create-ca">
-    <label>CA-Schlüsseltyp: 
+    <label>CA-Schlüsseltyp:
       <select name="ca_key_type" class="select">
-        <option value="rsa">RSA 4096</option>
-        <option value="secp256r1">ECC SECP256R1</option>
-        <option value="secp256r1">ECC SECP384R1</option>
-        <option value="secp521r1">ECC SECP521R1</option>
+        {% for value, label, _ in key_types %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
       </select>
     </label>
     <button type="submit" class="ca-button">CA erstellen</button>
@@ -31,17 +30,20 @@
   <label>Hostname:
     <input type="text" name="hostname" required>
   </label>
-  <label>Alternative Namen (Komma-getrennt):
-    <input type="text" name="alt_names">
+  <label>Alternative Namen (Komma-getrennt, DNS-Namen oder IP-Adressen):
+    <input type="text" name="alt_names" placeholder="z.B. www.example.com, 192.168.1.100">
   </label>
 
   <label>Zertifikat-Schlüsseltyp:
     <select name="cert_key_type" class="select">
-      <option value="rsa">RSA 4096</option>
-      <option value="secp256r1">ECC SECP256R1</option>
-      <option value="secp256r1">ECC SECP384R1</option>
-      <option value="secp521r1">ECC SECP521R1</option>
+      {% for value, label, _ in key_types %}
+      <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
     </select>
+  </label>
+
+  <label>Gültigkeit (Tage):
+    <input type="number" name="validity_days" value="825" min="1" max="3650">
   </label>
 
   <button type="submit">Erstellen</button>

@@ -51,6 +51,8 @@ uv pip install -r requirements.txt
 4. Run the app using uvicorn via the `uv` helper:
 
 ```sh
+export LOCAL_DATA_PATH="./data"
+export LOCAL_CA_PATH="/local-ca"
 uv run uvicorn main:app
 ```
 

@@ -33,6 +33,7 @@ These commands assume you use the included `uv` helper for environment managemen
 1. Sync the environment (install/manage virtualenvs and/or tool-specific support):
 
 ```sh
+uv lock --upgrade
 uv sync
 ```
 

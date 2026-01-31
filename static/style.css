@@ -198,3 +198,32 @@ pre {
   overflow-x: auto;
 }
 
+.download-links {
+  background-color: #2a2a3d;
+  padding: 1em;
+  border-radius: 8px;
+  margin-top: 1em;
+}
+
+.download-links h4 {
+  margin-top: 0;
+  margin-bottom: 0.8em;
+  color: #9ecfff;
+}
+
+.download-button {
+  display: inline-block;
+  background-color: #0078d7;
+  color: white;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9em;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.download-button:hover {
+  background-color: #005fa3;
+}
+

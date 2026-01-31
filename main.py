@@ -142,11 +142,19 @@ async def create_cert(
 
     cert_content = cert_bytes.decode()
     key_content = key_bytes.decode()
+    ca_cert_bytes = ca_cert.public_bytes(serialization.Encoding.PEM)
+    fullchain_content = cert_content + ca_cert_bytes.decode()
 
     # Zertifikat speichern
     cert_path = host_dir / f"{hostname}.crt"
     with open(cert_path, "wb") as f:
         f.write(cert_bytes)
+
+    # Fullchain speichern (Server-Zertifikat + CA-Zertifikat)
+    fullchain_path = host_dir / f"{hostname}.fullchain.crt"
+    with open(fullchain_path, "wb") as f:
+        f.write(cert_bytes)
+        f.write(ca_cert_bytes)
 
     # Key-Datei speichern
     key_path = host_dir / f"{hostname}.key"
@@ -167,6 +175,7 @@ async def create_cert(
             "hostname": hostname,
             "cert_content": cert_content,
             "key_content": key_content,
+            "fullchain_content": fullchain_content,
             "ca_exists": ca_exists,
             "key_types": KEY_TYPES,
         },

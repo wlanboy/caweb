@@ -51,8 +51,19 @@
 
 {% if hostname %}
 <h3>Ergebnis für {{ hostname }}</h3>
+
+<div class="download-links">
+  <h4>Downloads</h4>
+  <a href="/download/{{ hostname }}/{{ hostname }}.crt" class="download-button">Zertifikat (.crt)</a>
+  <a href="/download/{{ hostname }}/{{ hostname }}.fullchain.crt" class="download-button">Fullchain (.fullchain.crt)</a>
+  <a href="/download/{{ hostname }}/{{ hostname }}.key" class="download-button">Private Key (.key)</a>
+  <a href="/download/{{ hostname }}/{{ hostname }}.pem" class="download-button">Kombiniert (.pem)</a>
+</div>
+
 <h4>Certificate</h4>
 <pre>{{ cert_content }}</pre>
+<h4>Fullchain (Certificate + CA)</h4>
+<pre>{{ fullchain_content }}</pre>
 <h4>Private Key</h4>
 <pre>{{ key_content }}</pre>
 {% endif %}

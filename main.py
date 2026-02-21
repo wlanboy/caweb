@@ -11,6 +11,7 @@ from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, ec
+from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -97,6 +98,7 @@ async def create_cert(
         ca_cert = x509.load_pem_x509_certificate(f.read())
     with open(CA_KEY, "rb") as f:
         ca_key = serialization.load_pem_private_key(f.read(), password=None)
+    assert isinstance(ca_key, CertificateIssuerPrivateKeyTypes)
 
     # CSR bauen
     subject = x509.Name(

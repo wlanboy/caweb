@@ -67,6 +67,9 @@ Build the image:
 
 ```sh
 docker build -t caweb .
+
+docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep "caweb"
+caweb    latest    162MB
 ```
 
 Run interactively (temporary container):
@@ -84,7 +87,8 @@ docker run --name caweb -d -p 2000:2000 \
     --restart unless-stopped wlanboy/caweb:latest
 ```
 
-Notes:
+## Notes
+
 - The container expects a host directory mounted at `/local-ca` (adjust `-v` on the docker run command if you keep your data elsewhere).
 - The app listens on port 2000 in the image — change the host port mapping if 2000 is unavailable.
 
@@ -95,4 +99,3 @@ Notes:
 - If the `uv` helper is not available on your shell, you can run the same commands using the proper Python venv and uvicorn directly (for example, activate a virtualenv and run `uvicorn main:app`).
 - When editing templates or static files, restart the uvicorn server (or use an autoreload option during development, e.g. `uv run uvicorn main:app --reload`).
 - Check `requirements.txt` and `pyproject.toml` for dependency updates. Re-run `uv pip compile` after modifying `pyproject.toml`.
-

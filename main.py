@@ -259,3 +259,8 @@ async def create_ca(request: Request, ca_key_type: str = Form(...)):
             "key_types": KEY_TYPES,
         }
     )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=2000)

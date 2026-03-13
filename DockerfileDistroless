@@ -1,0 +1,60 @@
+# ============================
+# 1) Build stage
+# ============================
+FROM python:3.12-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install PyInstaller
+RUN pip install --no-cache-dir pyinstaller
+
+# Copy application
+COPY main.py /app/
+
+# Build standalone binary
+RUN pyinstaller \
+    --onedir \
+    --name main \
+    --distpath /app/dist \
+    --workpath /tmp/pyinstaller-build \
+    --collect-all fastapi \
+    --collect-all uvicorn \
+    --collect-all starlette \
+    --collect-all cryptography \
+    --collect-all jinja2 \
+    --collect-all multipart \
+    main.py
+
+# ============================
+# 2) Runtime stage
+# ============================
+FROM gcr.io/distroless/cc
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Copy compiled binary
+COPY --from=builder /app/dist/main/. /app/
+COPY templates/ /app/templates/
+COPY static/ /app/static/
+
+# Non-root user
+USER 65532
+
+EXPOSE 2000
+
+ENTRYPOINT ["/app/main"]

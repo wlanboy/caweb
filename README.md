@@ -2,13 +2,49 @@
 
 A tiny certificate authority (CA) web UI for issuing and managing certificates. This repository contains a small FastAPI (uvicorn) web application and a Dockerfile so you can run it locally or inside a container.
 
+## Architecture
+
+```text
+  Browser
+    |
+    | HTTP :2000
+    v
++---------------------------+
+|     FastAPI / Uvicorn     |
+|        (main.py)          |
+|                           |
+|  GET  /           (form)  |
+|  POST /           (issue) |
+|  POST /create-ca          |
+|  GET  /download/...       |
++----------+----------------+
+           |
+    +------+-------+
+    |               |
+    v               v
++----------+  +-----------+
+| /local-ca|  |   /data   |
+|  CA key  |  |   certs   |
+|  CA cert |  |  (per CN) |
++----------+  +-----------+
+
+  cryptography library
+  RSA 2048/4096
+  ECC P-256/P-384/P-521
+```
+
 ## Features
 
 - Simple web UI for CA operations (templates and static assets included)
+- RSA and ECC key support (RSA 2048/4096, P-256, P-384, P-521)
+- SAN support for DNS names and IP addresses
+- Downloads: `.crt`, `.key`, `.pem`, `.fullchain.crt`
+- Two Docker images: standard (162 MB) and distroless (77 MB)
+- Helm chart for Kubernetes with Istio and cert-manager support
 - Run locally using the provided `uv` wrapper commands
-- Build and run using Docker for deployment or sandboxed testing
 
-## steps
+## Steps
+
 Create ca
 ![CA creation](./screenshots/cacreate.png)
 
@@ -20,9 +56,9 @@ Install CA
 
 ## Requirements
 
-- Python 3.11+ (or the version used in your environment)
+- Python 3.12+
 - Docker (optional, for containerized runs)
-- The repository uses `uv` helper commands for environment and process management — use these exact commands below.
+- The repository uses `uv` for environment and process management.
 
 ---
 

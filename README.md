@@ -35,6 +35,9 @@ These commands assume you use the included `uv` helper for environment managemen
 ```sh
 uv lock --upgrade
 uv sync
+uv run pytest
+uv run pyright
+uv run ruff check
 ```
 
 2. Compile dependencies from `pyproject.toml` to a static `requirements.txt`:
@@ -43,13 +46,7 @@ uv sync
 uv pip compile pyproject.toml -o requirements.txt
 ```
 
-3. Install the compiled dependencies for Docker Image Check:
-
-```sh
-uv pip install -r requirements.txt
-```
-
-4. Run the app using uvicorn via the `uv` helper:
+3. Run the app using uvicorn via the `uv` helper:
 
 ```sh
 export LOCAL_DATA_PATH="./data"
@@ -67,16 +64,20 @@ Build the image:
 
 ```sh
 docker build -t caweb .
+docker build -f DockerfileDistroless -t caweb:distro .
 
 docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep "caweb"
 caweb    latest    162MB
+caweb    distro     77MB
 ```
 
 Run interactively (temporary container):
 
 ```sh
 # map port 2000 and mount a local CA directory
-docker run --rm -p 2000:2000 -v /local-ca:/local-ca caweb
+docker run --rm -p 2000:2000 -v /local-ca:/local-ca -v /data:/data caweb
+
+docker run --rm -p 2000:2000 -v /local-ca:/local-ca -v /data:/data caweb:distro
 ```
 
 Run detached (long-running service) with dockerhub image:

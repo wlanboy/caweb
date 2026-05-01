@@ -65,8 +65,7 @@ def generate_key(key_type: str):
 async def form(request: Request):
     ca_exists = CA_CERT.exists() and CA_KEY.exists()
     return templates.TemplateResponse(
-        "form.html", {
-            "request": request,
+        request, "form.html", {
             "ca_exists": ca_exists,
             "key_types": KEY_TYPES,
         }
@@ -171,9 +170,8 @@ async def create_cert(
 
     # Ergebnis direkt unter dem Formular anzeigen
     return templates.TemplateResponse(
-        "form.html",
+        request, "form.html",
         {
-            "request": request,
             "hostname": hostname,
             "cert_content": cert_content,
             "key_content": key_content,
@@ -252,8 +250,7 @@ async def create_ca(request: Request, ca_key_type: str = Form(...)):
         f.write(cert.public_bytes(serialization.Encoding.PEM))
 
     return templates.TemplateResponse(
-        "form.html", {
-            "request": request,
+        request, "form.html", {
             "ca_created": True,
             "ca_exists": True,
             "key_types": KEY_TYPES,

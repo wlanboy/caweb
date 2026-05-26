@@ -14,6 +14,9 @@
         {% endfor %}
       </select>
     </label>
+    <label>CA-Gültigkeit (Tage):
+      <input type="number" name="ca_validity_days" value="825" min="1" max="7300">
+    </label>
     <button type="submit" class="ca-button">CA erstellen</button>
   </form>
 </div>
@@ -22,6 +25,12 @@
 {% if ca_created %}
 <div class="ca-success">
   <p><strong>CA erfolgreich erstellt!</strong></p>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="ca-warning">
+  <p><strong>Fehler:</strong> {{ error }}</p>
 </div>
 {% endif %}
 

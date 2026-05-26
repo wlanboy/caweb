@@ -79,7 +79,17 @@ async def create_cert(
     cert_key_type: str = Form(...),
     validity_days: int = Form(825)
 ):
+    if not validate_safe_name(hostname):
+        raise HTTPException(status_code=400, detail="Ungültiger Hostname")
+
     ca_exists = CA_CERT.exists() and CA_KEY.exists()
+
+    if not ca_exists:
+        return templates.TemplateResponse(
+            request, "form.html",
+            {"ca_exists": False, "key_types": KEY_TYPES, "error": "Bitte zuerst eine CA erstellen."},
+            status_code=400,
+        )
 
     # Gültigkeit begrenzen (1 Tag bis 10 Jahre)
     validity_days = max(1, min(validity_days, 3650))
@@ -207,7 +217,7 @@ async def download_ca(filename: str):
     return FileResponse(full_path, filename=filename)
 
 @app.post("/create-ca", response_class=HTMLResponse)
-async def create_ca(request: Request, ca_key_type: str = Form(...)):
+async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_days: int = Form(825)):
     CERT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Key generieren
@@ -231,7 +241,7 @@ async def create_ca(request: Request, ca_key_type: str = Form(...)):
         .public_key(key.public_key())
         .serial_number(x509.random_serial_number())
         .not_valid_before(datetime.now(timezone.utc))
-        .not_valid_after(datetime.now(timezone.utc) + timedelta(days=825))
+        .not_valid_after(datetime.now(timezone.utc) + timedelta(days=max(1, min(ca_validity_days, 7300))))
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .sign(key, hashes.SHA256())
     )

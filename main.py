@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from cryptography import x509
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import NameOID, ExtendedKeyUsageOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, ec
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes
@@ -131,6 +131,20 @@ async def create_cert(
         .sign(key, hashes.SHA256())
     )
 
+    # KeyUsage je nach Schlüsseltyp: RSA braucht keyEncipherment, ECC keyAgreement
+    public_key = csr.public_key()
+    key_usage = x509.KeyUsage(
+        digital_signature=True,
+        key_encipherment=isinstance(public_key, rsa.RSAPublicKey),
+        key_agreement=isinstance(public_key, ec.EllipticCurvePublicKey),
+        content_commitment=False,
+        data_encipherment=False,
+        key_cert_sign=False,
+        crl_sign=False,
+        encipher_only=False,
+        decipher_only=False,
+    )
+
     # Zertifikat signieren
     cert = (
         x509.CertificateBuilder()
@@ -141,6 +155,9 @@ async def create_cert(
         .not_valid_before(datetime.now(timezone.utc))
         .not_valid_after(datetime.now(timezone.utc) + timedelta(days=validity_days))
         .add_extension(x509.SubjectAlternativeName(alt_names_objs), critical=False)
+        .add_extension(key_usage, critical=True)
+        .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH]), critical=False)
+        .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_key.public_key()), critical=False)
         .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
 
@@ -243,6 +260,21 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
         .not_valid_before(datetime.now(timezone.utc))
         .not_valid_after(datetime.now(timezone.utc) + timedelta(days=max(1, min(ca_validity_days, 7300))))
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
+        .add_extension(
+            x509.KeyUsage(
+                digital_signature=False,
+                key_cert_sign=True,
+                crl_sign=True,
+                content_commitment=False,
+                key_encipherment=False,
+                data_encipherment=False,
+                key_agreement=False,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        )
+        .add_extension(x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False)
         .sign(key, hashes.SHA256())
     )
 

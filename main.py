@@ -41,8 +41,15 @@ KEY_TYPE_GENERATORS = {kt[0]: kt[2] for kt in KEY_TYPES}
 
 
 def validate_safe_name(name: str) -> bool:
-    """Prüft ob ein Name sicher ist (keine Path Traversal Zeichen)."""
     return bool(SAFE_NAME_PATTERN.match(name)) and ".." not in name
+
+
+def key_type_label(public_key) -> str:
+    if isinstance(public_key, rsa.RSAPublicKey):
+        return f"RSA {public_key.key_size}"
+    if isinstance(public_key, ec.EllipticCurvePublicKey):
+        return f"ECC {public_key.curve.name}"
+    return type(public_key).__name__
 
 
 def parse_san_entry(entry: str):
@@ -298,6 +305,30 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
             "key_types": KEY_TYPES,
         }
     )
+
+
+@app.get("/certs", response_class=HTMLResponse)
+async def list_certs(request: Request):
+    now = datetime.now(timezone.utc)
+    certs = []
+    if FILE_DIR.exists():
+        for host_dir in sorted(FILE_DIR.iterdir()):
+            if not host_dir.is_dir():
+                continue
+            cert_path = host_dir / f"{host_dir.name}.crt"
+            if not cert_path.exists():
+                continue
+            with open(cert_path, "rb") as f:
+                cert = x509.load_pem_x509_certificate(f.read())
+            expires = cert.not_valid_after_utc
+            days_left = (expires - now).days
+            certs.append({
+                "hostname": host_dir.name,
+                "expires": expires.strftime("%Y-%m-%d"),
+                "days_left": days_left,
+                "key_type": key_type_label(cert.public_key()),
+            })
+    return templates.TemplateResponse(request, "certs.html", {"certs": certs})
 
 
 if __name__ == "__main__":

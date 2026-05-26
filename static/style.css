@@ -227,3 +227,53 @@ pre {
   background-color: #005fa3;
 }
 
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  background-color: #2a2a3d;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cert-table th, .cert-table td {
+  padding: 0.75em 1em;
+  text-align: left;
+  border-bottom: 1px solid #3a3a55;
+}
+
+.cert-table th {
+  background-color: #1e1e2f;
+  color: #9ecfff;
+  font-weight: bold;
+}
+
+.cert-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cert-table tr:hover td {
+  background-color: #34344a;
+}
+
+.cert-downloads {
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.badge-ok      { background-color: #1e3a2a; color: #c8f7c5; }
+.badge-warning { background-color: #3a2a1e; color: #ffd8b0; }
+.badge-expired { background-color: #3a1e1e; color: #f7c5c5; }
+
+.cert-empty {
+  color: #888;
+  margin-top: 1em;
+}
+

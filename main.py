@@ -86,17 +86,27 @@ async def create_cert(
     cert_key_type: str = Form(...),
     validity_days: int = Form(825)
 ):
-    if not validate_safe_name(hostname):
-        raise HTTPException(status_code=400, detail="Ungültiger Hostname")
+    form_values = {
+        "hostname": hostname,
+        "alt_names": alt_names,
+        "cert_key_type": cert_key_type,
+        "validity_days": validity_days,
+    }
 
     ca_exists = CA_CERT.exists() and CA_KEY.exists()
 
-    if not ca_exists:
+    def error_response(msg: str):
         return templates.TemplateResponse(
             request, "form.html",
-            {"ca_exists": False, "key_types": KEY_TYPES, "error": "Bitte zuerst eine CA erstellen."},
+            {"ca_exists": ca_exists, "key_types": KEY_TYPES, "error": msg, **form_values},
             status_code=400,
         )
+
+    if not validate_safe_name(hostname):
+        return error_response("Ungültiger Hostname.")
+
+    if not ca_exists:
+        return error_response("Bitte zuerst eine CA erstellen.")
 
     # Gültigkeit begrenzen (1 Tag bis 10 Jahre)
     validity_days = max(1, min(validity_days, 3650))

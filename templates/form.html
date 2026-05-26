@@ -37,28 +37,28 @@
 <h2>Zertifikat erstellen</h2>
 <form method="post" action="/">
   <label>Hostname:
-    <input type="text" name="hostname" required>
+    <input type="text" name="hostname" value="{{ hostname or '' }}" required>
   </label>
   <label>Alternative Namen (Komma-getrennt, DNS-Namen oder IP-Adressen):
-    <input type="text" name="alt_names" placeholder="z.B. www.example.com, 192.168.1.100">
+    <input type="text" name="alt_names" value="{{ alt_names or '' }}" placeholder="z.B. www.example.com, 192.168.1.100">
   </label>
 
   <label>Zertifikat-Schlüsseltyp:
     <select name="cert_key_type" class="select">
       {% for value, label, _ in key_types %}
-      <option value="{{ value }}">{{ label }}</option>
+      <option value="{{ value }}" {% if value == cert_key_type %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
   </label>
 
   <label>Gültigkeit (Tage):
-    <input type="number" name="validity_days" value="825" min="1" max="3650">
+    <input type="number" name="validity_days" value="{{ validity_days or 825 }}" min="1" max="3650">
   </label>
 
   <button type="submit">Erstellen</button>
 </form>
 
-{% if hostname %}
+{% if hostname and not error %}
 <h3>Ergebnis für {{ hostname }}</h3>
 
 <div class="download-links">

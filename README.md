@@ -1,6 +1,33 @@
-# caweb
+# caweb – Minimal Web UI for a Local Certificate Authority
 
-A tiny certificate authority (CA) web UI for issuing and managing certificates. This repository contains a small FastAPI (uvicorn) web application and a Dockerfile so you can run it locally or inside a container.
+caweb is a tiny, self‑contained Certificate Authority (CA) web interface for issuing and managing certificates.
+It includes a lightweight FastAPI (uvicorn) application and a Dockerfile, allowing you to run it locally or inside a container with minimal setup.
+
+The goal is to provide a simple, developer‑friendly CA tool without the complexity of full PKI suites — ideal for labs, internal services, development clusters, or automated certificate workflows.
+
+## Features
+- Simple web UI for CA operations  
+Includes templates and static assets for issuing and managing certificates.
+
+- RSA and ECC key support  
+Supports RSA‑2048/4096 and elliptic curves P‑256, P‑384, P‑521.
+
+- SAN support  
+Issue certificates with DNS names and IP addresses.
+
+- Multiple download formats  
+Export .crt, .key, .pem, and .fullchain.crt.
+
+- Two Docker images  
+Standard image (~162 MB) and a minimal distroless variant (~77 MB).
+
+- Helm chart for Kubernetes  
+Includes optional support for Istio and cert‑manager integration.
+
+- Local execution via uv wrapper  
+Run the CA directly on your machine without Docker.
+
+---
 
 ## Architecture
 
@@ -32,16 +59,6 @@ A tiny certificate authority (CA) web UI for issuing and managing certificates. 
   RSA 2048/4096
   ECC P-256/P-384/P-521
 ```
-
-## Features
-
-- Simple web UI for CA operations (templates and static assets included)
-- RSA and ECC key support (RSA 2048/4096, P-256, P-384, P-521)
-- SAN support for DNS names and IP addresses
-- Downloads: `.crt`, `.key`, `.pem`, `.fullchain.crt`
-- Two Docker images: standard (162 MB) and distroless (77 MB)
-- Helm chart for Kubernetes with Istio and cert-manager support
-- Run locally using the provided `uv` wrapper commands
 
 ## Steps
 

@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Verhindert, dass Python .pyc Dateien schreibt und sorgt für sofortige Log-Ausgabe
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -14,7 +14,7 @@ RUN python -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # Runtime stage
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # Umgebungsvariablen übernehmen
 ENV PYTHONDONTWRITEBYTECODE=1 \

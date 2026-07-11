@@ -8,16 +8,18 @@
 </head>
 <body>
   <header>
-    <h1>Zertifikatsverwaltung</h1>
+    <div class="brand">
+      <img src="/static/favicon.svg" alt="" width="28" height="28">
+      <h1>Zertifikatsverwaltung</h1>
+    </div>
     <nav>
-      <a href="/">Neues Zertifikat</a>
-      <a href="/certs">Zertifikatsliste</a>
+      <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Neues Zertifikat</a>
+      <a href="/certs" class="{% if request.url.path == '/certs' %}active{% endif %}">Zertifikatsliste</a>
+      <a href="/ca-info" class="{% if request.url.path == '/ca-info' %}active{% endif %}">CA-Installation</a>
     </nav>
   </header>
   <main>
     {% block content %}{% endblock %}
-
-    {% block ca_content %}{% endblock %}
   </main>
 </body>
 </html>

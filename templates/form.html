@@ -5,20 +5,24 @@
 
 {% if not ca_exists %}
 <div class="ca-warning">
-  <p><strong>Es wurde keine CA gefunden.</strong></p>
-  <form method="post" action="/create-ca">
-    <label>CA-Schlüsseltyp:
-      <select name="ca_key_type" class="select">
-        {% for value, label, _ in key_types %}
-        <option value="{{ value }}">{{ label }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>CA-Gültigkeit (Tage):
-      <input type="number" name="ca_validity_days" value="825" min="1" max="7300">
-    </label>
-    <button type="submit" class="ca-button">CA erstellen</button>
-  </form>
+  <div>
+    <p><strong>Es wurde keine CA gefunden.</strong> Bevor Zertifikate ausgestellt werden können, muss zuerst eine Certificate Authority erstellt werden.</p>
+    <form method="post" action="/create-ca">
+      <div class="form-row">
+        <label>CA-Schlüsseltyp:
+          <select name="ca_key_type" class="select">
+            {% for value, label, _ in key_types %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>CA-Gültigkeit (Tage):
+          <input type="number" name="ca_validity_days" value="825" min="1" max="7300">
+        </label>
+      </div>
+      <button type="submit" class="ca-button">CA erstellen</button>
+    </form>
+  </div>
 </div>
 {% endif %}
 
@@ -37,115 +41,49 @@
 <h2>Zertifikat erstellen</h2>
 <form method="post" action="/">
   <label>Hostname:
-    <input type="text" name="hostname" value="{{ hostname or '' }}" required>
+    <input type="text" name="hostname" value="{{ hostname or '' }}" placeholder="z.B. server.local" required>
   </label>
-  <label>Alternative Namen (Komma-getrennt, DNS-Namen oder IP-Adressen):
+  <label>Alternative Namen:
     <input type="text" name="alt_names" value="{{ alt_names or '' }}" placeholder="z.B. www.example.com, 192.168.1.100">
+    <span class="hint">Komma-getrennt, DNS-Namen oder IP-Adressen</span>
   </label>
 
-  <label>Zertifikat-Schlüsseltyp:
-    <select name="cert_key_type" class="select">
-      {% for value, label, _ in key_types %}
-      <option value="{{ value }}" {% if value == cert_key_type %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </label>
+  <div class="form-row">
+    <label>Zertifikat-Schlüsseltyp:
+      <select name="cert_key_type" class="select">
+        {% for value, label, _ in key_types %}
+        <option value="{{ value }}" {% if value == cert_key_type %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
 
-  <label>Gültigkeit (Tage):
-    <input type="number" name="validity_days" value="{{ validity_days or 825 }}" min="1" max="3650">
-  </label>
+    <label>Gültigkeit (Tage):
+      <input type="number" name="validity_days" value="{{ validity_days or 825 }}" min="1" max="3650">
+    </label>
+  </div>
 
-  <button type="submit">Erstellen</button>
+  <button type="submit">Zertifikat erstellen</button>
 </form>
 
 {% if hostname and not error %}
-<h3>Ergebnis für {{ hostname }}</h3>
+<div class="card">
+  <h3>Ergebnis für {{ hostname }}</h3>
 
-<div class="download-links">
-  <h4>Downloads</h4>
-  <a href="/download/{{ hostname }}/{{ hostname }}.crt" class="download-button">Zertifikat (.crt)</a>
-  <a href="/download/{{ hostname }}/{{ hostname }}.fullchain.crt" class="download-button">Fullchain (.fullchain.crt)</a>
-  <a href="/download/{{ hostname }}/{{ hostname }}.key" class="download-button">Private Key (.key)</a>
-  <a href="/download/{{ hostname }}/{{ hostname }}.pem" class="download-button">Kombiniert (.pem)</a>
+  <div class="download-links">
+    <h4>Downloads</h4>
+    <a href="/download/{{ hostname }}/{{ hostname }}.crt" class="download-button">Zertifikat (.crt)</a>
+    <a href="/download/{{ hostname }}/{{ hostname }}.fullchain.crt" class="download-button">Fullchain (.fullchain.crt)</a>
+    <a href="/download/{{ hostname }}/{{ hostname }}.key" class="download-button">Private Key (.key)</a>
+    <a href="/download/{{ hostname }}/{{ hostname }}.pem" class="download-button">Kombiniert (.pem)</a>
+  </div>
+
+  <h4>Certificate</h4>
+  <pre>{{ cert_content }}</pre>
+  <h4>Fullchain (Certificate + CA)</h4>
+  <pre>{{ fullchain_content }}</pre>
+  <h4>Private Key</h4>
+  <pre>{{ key_content }}</pre>
 </div>
-
-<h4>Certificate</h4>
-<pre>{{ cert_content }}</pre>
-<h4>Fullchain (Certificate + CA)</h4>
-<pre>{{ fullchain_content }}</pre>
-<h4>Private Key</h4>
-<pre>{{ key_content }}</pre>
-{% endif %}
-{% endblock %}
-
-{% block ca_content %}
-{% if ca_exists %}
-
-<div class="ca-collapsible-container">
-
-  <!-- Checkbox steuert das Auf-/Zuklappen -->
-  <input type="checkbox" id="ca-toggle" class="ca-checkbox">
-
-  <!-- Label ist der sichtbare Button -->
-  <label for="ca-toggle" class="ca-toggle">
-    <span class="ca-toggle-icon">⚠️</span>
-    <span class="ca-toggle-text">Hinweise zur Installation der CA anzeigen</span>
-  </label>
-
-  <!-- Der einklappbare Bereich -->
-  <div class="ca-info">
-
-    <div class="ca-download-box">
-      <h3>CA herunterladen</h3>
-
-      <a href="/download-ca/ca.pem" class="ca-download-button">CA Zertifikat herunterladen</a>
-
-      <div class="ca-install-hint">
-        <h4>Installation der CA</h4>
-        <p>Damit Zertifikate als vertrauenswürdig gelten, muss die CA im System installiert werden.</p>
-
-        <h5>Linux (Debian/Ubuntu)</h5>
-        <pre>sudo cp ca.pem /usr/local/share/ca-certificates/homelab-ca.crt
-sudo update-ca-certificates</pre>
-
-        <h5>Linux (RHEL/CentOS/Fedora)</h5>
-        <pre>sudo cp ca.pem /etc/pki/ca-trust/source/anchors/homelab-ca.crt
-sudo update-ca-trust</pre>
-
-        <h5>macOS</h5>
-        <pre>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.pem</pre>
-
-        <h5>Android</h5>
-        <p>
-          1. „ca.pem“ auf das Gerät kopieren (ggf. in .crt umbenennen)<br>
-          2. Einstellungen &rarr; Sicherheit &rarr; Verschlüsselung & Anmeldedaten<br>
-          3. „CA-Zertifikat“ (oder „Von Speicher installieren“) wählen<br>
-          4. Warnung bestätigen und Datei auswählen
-        </p>
-
-        <h5>iOS (iPhone/iPad)</h5>
-        <p>
-          1. „ca.pem“ via AirDrop oder iCloud öffnen und „Laden“ erlauben<br>
-          2. Einstellungen &rarr; Profil geladen &rarr; Installieren<br>
-          3. Einstellungen &rarr; Allgemein &rarr; Info &rarr; Zertifikatsvertrauenseinstellungen<br>
-          4. Schalter für die neue CA unter „Volles Vertrauen für Root-Zertifikate“ aktivieren
-        </p>
-
-        <h5>Windows</h5>
-        <p>
-          1. „ca.pem“ doppelklicken<br>
-          2. „Zertifikat installieren“ wählen<br>
-          3. „Lokaler Computer“ auswählen<br>
-          4. In „Vertrauenswürdige Stammzertifizierungsstellen“ installieren
-        </p>
-      </div><!--ca-install-hint-->
-
-    </div><!--ca-download-box-->
-
-  </div><!--ca-info-->
-
-</div> <!--ca-collapsible-container-->
-
 {% endif %}
 {% endblock %}
 

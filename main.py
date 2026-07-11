@@ -317,6 +317,12 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
     )
 
 
+@app.get("/ca-info", response_class=HTMLResponse)
+async def ca_info(request: Request):
+    ca_exists = CA_CERT.exists() and CA_KEY.exists()
+    return templates.TemplateResponse(request, "ca_info.html", {"ca_exists": ca_exists})
+
+
 @app.get("/certs", response_class=HTMLResponse)
 async def list_certs(request: Request):
     now = datetime.now(timezone.utc)

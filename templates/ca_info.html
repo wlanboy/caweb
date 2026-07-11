@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}CA-Installation{% endblock %}
+{% block content %}
+
+<h2>CA-Installation</h2>
+
+{% if ca_exists %}
+<div class="card">
+  <h3>CA herunterladen</h3>
+
+  <a href="/download-ca/ca.pem" class="ca-download-button">CA Zertifikat herunterladen</a>
+
+  <div class="ca-install-hint">
+    <h4>Installation der CA</h4>
+    <p>Damit Zertifikate als vertrauenswürdig gelten, muss die CA im System installiert werden.</p>
+
+    <h5>Linux (Debian/Ubuntu)</h5>
+    <pre>sudo cp ca.pem /usr/local/share/ca-certificates/homelab-ca.crt
+sudo update-ca-certificates</pre>
+
+    <h5>Linux (RHEL/CentOS/Fedora)</h5>
+    <pre>sudo cp ca.pem /etc/pki/ca-trust/source/anchors/homelab-ca.crt
+sudo update-ca-trust</pre>
+
+    <h5>macOS</h5>
+    <pre>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.pem</pre>
+
+    <h5>Android</h5>
+    <p>
+      1. „ca.pem“ auf das Gerät kopieren (ggf. in .crt umbenennen)<br>
+      2. Einstellungen &rarr; Sicherheit &rarr; Verschlüsselung & Anmeldedaten<br>
+      3. „CA-Zertifikat“ (oder „Von Speicher installieren“) wählen<br>
+      4. Warnung bestätigen und Datei auswählen
+    </p>
+
+    <h5>iOS (iPhone/iPad)</h5>
+    <p>
+      1. „ca.pem“ via AirDrop oder iCloud öffnen und „Laden“ erlauben<br>
+      2. Einstellungen &rarr; Profil geladen &rarr; Installieren<br>
+      3. Einstellungen &rarr; Allgemein &rarr; Info &rarr; Zertifikatsvertrauenseinstellungen<br>
+      4. Schalter für die neue CA unter „Volles Vertrauen für Root-Zertifikate“ aktivieren
+    </p>
+
+    <h5>Windows</h5>
+    <p>
+      1. „ca.pem“ doppelklicken<br>
+      2. „Zertifikat installieren“ wählen<br>
+      3. „Lokaler Computer“ auswählen<br>
+      4. In „Vertrauenswürdige Stammzertifizierungsstellen“ installieren
+    </p>
+  </div><!--ca-install-hint-->
+</div><!--card-->
+{% else %}
+<p class="cert-empty">Es wurde noch keine CA erstellt. <a href="/">Jetzt eine CA anlegen</a>.</p>
+{% endif %}
+
+{% endblock %}

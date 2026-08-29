@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import cert_downloads %}
 
 {% block title %}Zertifikatsliste{% endblock %}
 {% block content %}
@@ -33,10 +34,7 @@
         {% endif %}
       </td>
       <td class="cert-downloads">
-        <a href="/download/{{ cert.hostname }}/{{ cert.hostname }}.crt" class="download-button">.crt</a>
-        <a href="/download/{{ cert.hostname }}/{{ cert.hostname }}.fullchain.crt" class="download-button">.fullchain.crt</a>
-        <a href="/download/{{ cert.hostname }}/{{ cert.hostname }}.key" class="download-button">.key</a>
-        <a href="/download/{{ cert.hostname }}/{{ cert.hostname }}.pem" class="download-button">.pem</a>
+        {{ cert_downloads(cert.hostname, ".crt", ".fullchain.crt", ".key", ".pem") }}
       </td>
     </tr>
     {% endfor %}

@@ -1,0 +1,6 @@
+{% macro cert_downloads(hostname, crt_label, fullchain_label, key_label, pem_label) %}
+<a href="/download/{{ hostname }}/{{ hostname }}.crt" class="download-button">{{ crt_label }}</a>
+<a href="/download/{{ hostname }}/{{ hostname }}.fullchain.crt" class="download-button">{{ fullchain_label }}</a>
+<a href="/download/{{ hostname }}/{{ hostname }}.key" class="download-button">{{ key_label }}</a>
+<a href="/download/{{ hostname }}/{{ hostname }}.pem" class="download-button">{{ pem_label }}</a>
+{% endmacro %}

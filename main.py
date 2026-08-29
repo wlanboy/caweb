@@ -72,6 +72,36 @@ def generate_key(key_type: str):
     return KEY_TYPE_GENERATORS[key_type]()
 
 
+def build_name(organization: str, common_name: str) -> x509.Name:
+    return x509.Name(
+        [
+            x509.NameAttribute(NameOID.COUNTRY_NAME, "DE"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Germany"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, "LAN"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization),
+            x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+        ]
+    )
+
+
+async def save_cert_files(
+    host_dir: Path,
+    hostname: str,
+    cert_bytes: bytes,
+    key_bytes: bytes,
+    ca_cert_bytes: bytes,
+) -> None:
+    cert_path = host_dir / f"{hostname}.crt"
+    fullchain_path = host_dir / f"{hostname}.fullchain.crt"
+    key_path = host_dir / f"{hostname}.key"
+    combined_path = host_dir / f"{hostname}.pem"
+
+    await asyncio.to_thread(cert_path.write_bytes, cert_bytes)
+    await asyncio.to_thread(fullchain_path.write_bytes, cert_bytes + ca_cert_bytes)
+    await asyncio.to_thread(key_path.write_bytes, key_bytes)
+    await asyncio.to_thread(combined_path.write_bytes, key_bytes + cert_bytes)
+
+
 @app.get("/", response_class=HTMLResponse)
 async def form(request: Request):
     ca_exists = CA_CERT.exists() and CA_KEY.exists()
@@ -131,15 +161,7 @@ async def create_cert(
     assert isinstance(ca_key, CertificateIssuerPrivateKeyTypes)
 
     # CSR bauen
-    subject = x509.Name(
-        [
-            x509.NameAttribute(NameOID.COUNTRY_NAME, "DE"),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Germany"),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, "LAN"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Homelab"),
-            x509.NameAttribute(NameOID.COMMON_NAME, hostname),
-        ]
-    )
+    subject = build_name("Homelab", hostname)
     # SANs erstellen: Hostname + alternative Namen (DNS oder IP)
     alt_names_objs = [parse_san_entry(hostname)] + [
         parse_san_entry(n) for n in alt_names_list
@@ -194,21 +216,8 @@ async def create_cert(
     ca_cert_bytes = ca_cert.public_bytes(serialization.Encoding.PEM)
     fullchain_content = cert_content + ca_cert_bytes.decode()
 
-    # Zertifikat speichern
-    cert_path = host_dir / f"{hostname}.crt"
-    await asyncio.to_thread(cert_path.write_bytes, cert_bytes)
-
-    # Fullchain speichern (Server-Zertifikat + CA-Zertifikat)
-    fullchain_path = host_dir / f"{hostname}.fullchain.crt"
-    await asyncio.to_thread(fullchain_path.write_bytes, cert_bytes + ca_cert_bytes)
-
-    # Key-Datei speichern
-    key_path = host_dir / f"{hostname}.key"
-    await asyncio.to_thread(key_path.write_bytes, key_bytes)
-
-    # Kombinierte PEM-Datei (Key + Zertifikat)
-    combined_path = host_dir / f"{hostname}.pem"
-    await asyncio.to_thread(combined_path.write_bytes, key_bytes + cert_bytes)
+    # Zertifikat, Fullchain, Key und kombinierte PEM-Datei speichern
+    await save_cert_files(host_dir, hostname, cert_bytes, key_bytes, ca_cert_bytes)
 
     # Ergebnis direkt unter dem Formular anzeigen
     return templates.TemplateResponse(
@@ -256,15 +265,7 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
     key = generate_key(ca_key_type)
 
     # CA-Zertifikat erstellen
-    subject = issuer = x509.Name(
-        [
-            x509.NameAttribute(NameOID.COUNTRY_NAME, "DE"),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Germany"),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, "LAN"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Homelab CA"),
-            x509.NameAttribute(NameOID.COMMON_NAME, "Homelab Root CA"),
-        ]
-    )
+    subject = issuer = build_name("Homelab CA", "Homelab Root CA")
 
     cert = (
         x509.CertificateBuilder()

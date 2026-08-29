@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import cert_downloads %}
 
 {% block title %}Neues Zertifikat{% endblock %}
 {% block content %}
@@ -71,10 +72,7 @@
 
   <div class="download-links">
     <h4>Downloads</h4>
-    <a href="/download/{{ hostname }}/{{ hostname }}.crt" class="download-button">Zertifikat (.crt)</a>
-    <a href="/download/{{ hostname }}/{{ hostname }}.fullchain.crt" class="download-button">Fullchain (.fullchain.crt)</a>
-    <a href="/download/{{ hostname }}/{{ hostname }}.key" class="download-button">Private Key (.key)</a>
-    <a href="/download/{{ hostname }}/{{ hostname }}.pem" class="download-button">Kombiniert (.pem)</a>
+    {{ cert_downloads(hostname, "Zertifikat (.crt)", "Fullchain (.fullchain.crt)", "Private Key (.key)", "Kombiniert (.pem)") }}
   </div>
 
   <h4>Certificate</h4>

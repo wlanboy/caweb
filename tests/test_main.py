@@ -1,9 +1,9 @@
 import pytest
-from fastapi import HTTPException
 from cryptography import x509
-from cryptography.hazmat.primitives.asymmetric import rsa, ec
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from fastapi import HTTPException
 
-from main import validate_safe_name, parse_san_entry, generate_key
+from main import generate_key, parse_san_entry, validate_safe_name
 
 
 class TestValidateSafeName:

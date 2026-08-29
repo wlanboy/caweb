@@ -1,17 +1,21 @@
-import os
+import asyncio
 import ipaddress
-from pathlib import Path
-from datetime import datetime, timedelta, timezone
+import os
 import re
-from fastapi import FastAPI, Form, Request, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from cryptography.hazmat.primitives.asymmetric.types import (
+    CertificateIssuerPrivateKeyTypes,
+)
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
+from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from cryptography import x509
-from cryptography.x509.oid import NameOID, ExtendedKeyUsageOID
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa, ec
-from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -120,10 +124,10 @@ async def create_cert(
     host_dir.mkdir(parents=True, exist_ok=True)
 
     # CA laden
-    with open(CA_CERT, "rb") as f:
-        ca_cert = x509.load_pem_x509_certificate(f.read())
-    with open(CA_KEY, "rb") as f:
-        ca_key = serialization.load_pem_private_key(f.read(), password=None)
+    ca_cert = x509.load_pem_x509_certificate(await asyncio.to_thread(CA_CERT.read_bytes))
+    ca_key = serialization.load_pem_private_key(
+        await asyncio.to_thread(CA_KEY.read_bytes), password=None
+    )
     assert isinstance(ca_key, CertificateIssuerPrivateKeyTypes)
 
     # CSR bauen
@@ -169,8 +173,8 @@ async def create_cert(
         .issuer_name(ca_cert.subject)
         .public_key(csr.public_key())
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.now(timezone.utc))
-        .not_valid_after(datetime.now(timezone.utc) + timedelta(days=validity_days))
+        .not_valid_before(datetime.now(UTC))
+        .not_valid_after(datetime.now(UTC) + timedelta(days=validity_days))
         .add_extension(x509.SubjectAlternativeName(alt_names_objs), critical=False)
         .add_extension(key_usage, critical=True)
         .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH]), critical=False)
@@ -192,25 +196,19 @@ async def create_cert(
 
     # Zertifikat speichern
     cert_path = host_dir / f"{hostname}.crt"
-    with open(cert_path, "wb") as f:
-        f.write(cert_bytes)
+    await asyncio.to_thread(cert_path.write_bytes, cert_bytes)
 
     # Fullchain speichern (Server-Zertifikat + CA-Zertifikat)
     fullchain_path = host_dir / f"{hostname}.fullchain.crt"
-    with open(fullchain_path, "wb") as f:
-        f.write(cert_bytes)
-        f.write(ca_cert_bytes)
+    await asyncio.to_thread(fullchain_path.write_bytes, cert_bytes + ca_cert_bytes)
 
     # Key-Datei speichern
     key_path = host_dir / f"{hostname}.key"
-    with open(key_path, "wb") as f:
-        f.write(key_bytes)
+    await asyncio.to_thread(key_path.write_bytes, key_bytes)
 
     # Kombinierte PEM-Datei (Key + Zertifikat)
     combined_path = host_dir / f"{hostname}.pem"
-    with open(combined_path, "wb") as f:
-        f.write(key_bytes)
-        f.write(cert_bytes)
+    await asyncio.to_thread(combined_path.write_bytes, key_bytes + cert_bytes)
 
     # Ergebnis direkt unter dem Formular anzeigen
     return templates.TemplateResponse(
@@ -274,8 +272,8 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
         .issuer_name(issuer)
         .public_key(key.public_key())
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.now(timezone.utc))
-        .not_valid_after(datetime.now(timezone.utc) + timedelta(days=max(1, min(ca_validity_days, 7300))))
+        .not_valid_before(datetime.now(UTC))
+        .not_valid_after(datetime.now(UTC) + timedelta(days=max(1, min(ca_validity_days, 7300))))
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .add_extension(
             x509.KeyUsage(
@@ -296,17 +294,16 @@ async def create_ca(request: Request, ca_key_type: str = Form(...), ca_validity_
     )
 
     # Dateien speichern
-    with open(CA_KEY, "wb") as f:
-        f.write(
-            key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            )
-        )
+    await asyncio.to_thread(
+        CA_KEY.write_bytes,
+        key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ),
+    )
 
-    with open(CA_CERT, "wb") as f:
-        f.write(cert.public_bytes(serialization.Encoding.PEM))
+    await asyncio.to_thread(CA_CERT.write_bytes, cert.public_bytes(serialization.Encoding.PEM))
 
     return templates.TemplateResponse(
         request, "form.html", {
@@ -325,7 +322,7 @@ async def ca_info(request: Request):
 
 @app.get("/certs", response_class=HTMLResponse)
 async def list_certs(request: Request):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     certs = []
     if FILE_DIR.exists():
         for host_dir in sorted(FILE_DIR.iterdir()):
@@ -334,8 +331,7 @@ async def list_certs(request: Request):
             cert_path = host_dir / f"{host_dir.name}.crt"
             if not cert_path.exists():
                 continue
-            with open(cert_path, "rb") as f:
-                cert = x509.load_pem_x509_certificate(f.read())
+            cert = x509.load_pem_x509_certificate(await asyncio.to_thread(cert_path.read_bytes))
             expires = cert.not_valid_after_utc
             days_left = (expires - now).days
             certs.append({

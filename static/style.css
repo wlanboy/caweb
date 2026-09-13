@@ -573,10 +573,17 @@ pre {
   white-space: normal;
 }
 
-.cert-downloads .download-button,
-.cert-actions .action-button,
-.cert-actions .inline-form {
-  display: inline-flex;
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.button-group .download-button,
+.button-group .action-button,
+.button-group .inline-form {
+  margin: 0;
 }
 
 .inline-form {

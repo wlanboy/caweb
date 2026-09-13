@@ -38,13 +38,17 @@
         {% endif %}
       </td>
       <td class="cert-downloads">
-        {{ cert_downloads(cert.hostname, ".crt", ".fullchain.crt", ".key", ".pem") }}
+        <div class="button-group">
+          {{ cert_downloads(cert.hostname, ".crt", ".fullchain.crt", ".key", ".pem") }}
+        </div>
       </td>
       <td class="cert-actions">
-        <a href="/?hostname={{ cert.hostname }}" class="action-button">Erneuern</a>
-        <form method="post" action="/delete/{{ cert.hostname }}" class="inline-form" onsubmit="return confirm('Zertifikat für {{ cert.hostname }} wirklich löschen?');">
-          <button type="submit" class="action-button action-button-danger">Löschen</button>
-        </form>
+        <div class="button-group">
+          <a href="/?hostname={{ cert.hostname }}" class="action-button">Erneuern</a>
+          <form method="post" action="/delete/{{ cert.hostname }}" class="inline-form" onsubmit="return confirm('Zertifikat für {{ cert.hostname }} wirklich löschen?');">
+            <button type="submit" class="action-button action-button-danger">Löschen</button>
+          </form>
+        </div>
       </td>
     </tr>
     {% endfor %}

@@ -66,7 +66,7 @@
   <button type="submit">Zertifikat erstellen</button>
 </form>
 
-{% if hostname and not error %}
+{% if cert_content %}
 <div class="card">
   <h3>Ergebnis für {{ hostname }}</h3>
 
@@ -75,12 +75,23 @@
     {{ cert_downloads(hostname, "Zertifikat (.crt)", "Fullchain (.fullchain.crt)", "Private Key (.key)", "Kombiniert (.pem)") }}
   </div>
 
-  <h4>Certificate</h4>
-  <pre>{{ cert_content }}</pre>
-  <h4>Fullchain (Certificate + CA)</h4>
-  <pre>{{ fullchain_content }}</pre>
-  <h4>Private Key</h4>
-  <pre>{{ key_content }}</pre>
+  <div class="pre-header">
+    <h4>Certificate</h4>
+    <button type="button" class="copy-button" data-copy-target="cert-content">Kopieren</button>
+  </div>
+  <pre id="cert-content">{{ cert_content }}</pre>
+
+  <div class="pre-header">
+    <h4>Fullchain (Certificate + CA)</h4>
+    <button type="button" class="copy-button" data-copy-target="fullchain-content">Kopieren</button>
+  </div>
+  <pre id="fullchain-content">{{ fullchain_content }}</pre>
+
+  <div class="pre-header">
+    <h4>Private Key</h4>
+    <button type="button" class="copy-button" data-copy-target="key-content">Kopieren</button>
+  </div>
+  <pre id="key-content">{{ key_content }}</pre>
 </div>
 {% endif %}
 {% endblock %}

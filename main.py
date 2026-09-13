@@ -2,6 +2,7 @@ import asyncio
 import ipaddress
 import os
 import re
+import shutil
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from cryptography.hazmat.primitives.asymmetric.types import (
 )
 from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 from fastapi import FastAPI, Form, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -54,6 +55,20 @@ def key_type_label(public_key) -> str:
     if isinstance(public_key, ec.EllipticCurvePublicKey):
         return f"ECC {public_key.curve.name}"
     return type(public_key).__name__
+
+
+def key_type_value(public_key) -> str | None:
+    """Ermittelt den passenden KEY_TYPES-value für ein Formular-Prefill."""
+    if isinstance(public_key, rsa.RSAPublicKey):
+        if public_key.key_size == 2048:
+            return "rsa2048"
+        if public_key.key_size == 4096:
+            return "rsa4096"
+    if isinstance(public_key, ec.EllipticCurvePublicKey):
+        curve_name = public_key.curve.name
+        if curve_name in ("secp256r1", "secp384r1", "secp521r1"):
+            return curve_name
+    return None
 
 
 def parse_san_entry(entry: str):
@@ -103,14 +118,31 @@ async def save_cert_files(
 
 
 @app.get("/", response_class=HTMLResponse)
-async def form(request: Request):
+async def form(request: Request, hostname: str | None = None):
     ca_exists = CA_CERT.exists() and CA_KEY.exists()
-    return templates.TemplateResponse(
-        request, "form.html", {
-            "ca_exists": ca_exists,
-            "key_types": KEY_TYPES,
-        }
-    )
+    context = {
+        "ca_exists": ca_exists,
+        "key_types": KEY_TYPES,
+    }
+
+    # Vorbefüllung des Formulars für "Erneuern" aus der Zertifikatsliste
+    if hostname and validate_safe_name(hostname):
+        cert_path = FILE_DIR / hostname / f"{hostname}.crt"
+        context["hostname"] = hostname
+        if cert_path.exists():
+            cert = x509.load_pem_x509_certificate(await asyncio.to_thread(cert_path.read_bytes))
+            san_ext = cert.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+            dns_names = san_ext.value.get_values_for_type(x509.DNSName)
+            ip_addrs = san_ext.value.get_values_for_type(x509.IPAddress)
+            alt_entries = [n for n in dns_names if n != hostname] + [
+                str(ip) for ip in ip_addrs if str(ip) != hostname
+            ]
+            context["alt_names"] = ", ".join(alt_entries)
+            cert_key_type = key_type_value(cert.public_key())
+            if cert_key_type:
+                context["cert_key_type"] = cert_key_type
+
+    return templates.TemplateResponse(request, "form.html", context)
 
 @app.post("/", response_class=HTMLResponse)
 async def create_cert(
@@ -242,6 +274,18 @@ async def download_file(hostname: str, filename: str):
         raise HTTPException(status_code=404, detail="Datei nicht gefunden")
 
     return FileResponse(full_path, filename=filename)
+
+@app.post("/delete/{hostname}")
+async def delete_cert(hostname: str):
+    if not validate_safe_name(hostname):
+        raise HTTPException(status_code=400, detail="Ungültiger Hostname.")
+
+    host_dir = FILE_DIR / hostname
+    if host_dir.exists():
+        await asyncio.to_thread(shutil.rmtree, host_dir)
+
+    return RedirectResponse(url="/certs", status_code=303)
+
 
 @app.get("/download-ca/{filename}")
 async def download_ca(filename: str):

@@ -7,20 +7,24 @@
 <h2>Ausgestellte Zertifikate</h2>
 
 {% if certs %}
+<div class="table-toolbar">
+  <input type="search" id="cert-search" class="cert-search" placeholder="Hostname suchen…" aria-label="Hostname suchen">
+</div>
 <div class="table-wrapper">
 <table class="cert-table">
   <thead>
     <tr>
-      <th>Hostname</th>
-      <th>Schlüsseltyp</th>
-      <th>Gültig bis</th>
-      <th>Status</th>
+      <th data-sort-key="hostname">Hostname</th>
+      <th data-sort-key="key-type">Schlüsseltyp</th>
+      <th data-sort-key="expires">Gültig bis</th>
+      <th data-sort-key="days-left" data-sort-type="number">Status</th>
       <th>Downloads</th>
+      <th>Aktionen</th>
     </tr>
   </thead>
   <tbody>
     {% for cert in certs %}
-    <tr>
+    <tr data-hostname="{{ cert.hostname }}" data-key-type="{{ cert.key_type }}" data-expires="{{ cert.expires }}" data-days-left="{{ cert.days_left }}">
       <td>{{ cert.hostname }}</td>
       <td>{{ cert.key_type }}</td>
       <td>{{ cert.expires }}</td>
@@ -35,6 +39,12 @@
       </td>
       <td class="cert-downloads">
         {{ cert_downloads(cert.hostname, ".crt", ".fullchain.crt", ".key", ".pem") }}
+      </td>
+      <td class="cert-actions">
+        <a href="/?hostname={{ cert.hostname }}" class="action-button">Erneuern</a>
+        <form method="post" action="/delete/{{ cert.hostname }}" class="inline-form" onsubmit="return confirm('Zertifikat für {{ cert.hostname }} wirklich löschen?');">
+          <button type="submit" class="action-button action-button-danger">Löschen</button>
+        </form>
       </td>
     </tr>
     {% endfor %}

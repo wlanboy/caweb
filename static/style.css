@@ -405,6 +405,52 @@ pre {
 }
 
 /* ---------------------------------------------------------------- */
+/* Pre header & copy buttons                                          */
+/* ---------------------------------------------------------------- */
+.pre-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+
+.pre-header h4 {
+  margin: 0;
+}
+
+.copy-button {
+  width: auto;
+  margin-top: 0;
+  padding: 0.35em 0.9em;
+  font-size: 0.85em;
+  font-weight: 600;
+  background-color: var(--bg-elevated-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.copy-button:hover {
+  background-color: var(--bg-elevated-3);
+  border-color: #454568;
+}
+
+.copy-button.copy-success {
+  background-color: var(--success-bg);
+  border-color: var(--success);
+  color: var(--success-text);
+}
+
+.copy-button.copy-error {
+  background-color: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger-text);
+}
+
+/* ---------------------------------------------------------------- */
 /* Download links                                                     */
 /* ---------------------------------------------------------------- */
 .download-links {
@@ -445,18 +491,27 @@ pre {
 /* ---------------------------------------------------------------- */
 /* Certificate table                                                  */
 /* ---------------------------------------------------------------- */
+.table-toolbar {
+  margin-top: 1em;
+}
+
+.cert-search {
+  max-width: 320px;
+  margin-top: 0;
+}
+
 .table-wrapper {
   overflow-x: auto;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-soft);
-  margin-top: 1em;
+  margin-top: 0.8em;
 }
 
 .cert-table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--bg-elevated);
-  min-width: 640px;
+  min-width: 700px;
 }
 
 .cert-table th, .cert-table td {
@@ -475,6 +530,32 @@ pre {
   letter-spacing: 0.04em;
 }
 
+.cert-table th[data-sort-key] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cert-table th[data-sort-key]:hover {
+  background-color: var(--bg-elevated-3);
+}
+
+.cert-table th[data-sort-key]::after {
+  content: "↕";
+  display: inline-block;
+  margin-left: 0.4em;
+  color: var(--text-faint);
+}
+
+.cert-table th.sort-asc::after {
+  content: "↑";
+  color: var(--accent-text);
+}
+
+.cert-table th.sort-desc::after {
+  content: "↓";
+  color: var(--accent-text);
+}
+
 .cert-table tr:last-child td {
   border-bottom: none;
 }
@@ -487,8 +568,54 @@ pre {
   background-color: var(--bg-elevated-2);
 }
 
-.cert-downloads {
-  white-space: nowrap;
+.cert-table td.cert-downloads,
+.cert-table td.cert-actions {
+  white-space: normal;
+}
+
+.cert-downloads .download-button,
+.cert-actions .action-button,
+.cert-actions .inline-form {
+  display: inline-flex;
+}
+
+.inline-form {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.action-button {
+  display: inline-block;
+  width: auto;
+  padding: 0.5em 1em;
+  margin: 0 0.4em 0 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-elevated-2);
+  color: var(--text);
+  font-size: 0.9em;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.action-button:hover {
+  background-color: var(--bg-elevated-3);
+  border-color: #454568;
+}
+
+.action-button-danger {
+  color: var(--danger-text);
+}
+
+.action-button-danger:hover {
+  background-color: var(--danger-bg);
+  border-color: var(--danger);
 }
 
 .badge {

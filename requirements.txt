@@ -10,32 +10,35 @@ cffi==2.1.1
     # via cryptography
 click==8.5.0
     # via uvicorn
-cryptography==50.0.1
+cryptography==50.0.2
     # via caweb (pyproject.toml)
-fastapi==0.141.1
+fastapi==0.162.0
     # via caweb (pyproject.toml)
 h11==0.16.0
     # via uvicorn
-idna==3.19
+idna==3.20
     # via anyio
 jinja2==3.1.6
     # via caweb (pyproject.toml)
-markupsafe==3.0.3
+markupsafe==3.0.4
     # via jinja2
-pycparser==3.0
-    # via cffi
-pydantic==2.13.5
+opentelemetry-api==1.45.1
     # via fastapi
-pydantic-core==2.46.5
+pycparser==3.12
+    # via cffi
+pydantic==2.14.1
+    # via fastapi
+pydantic-core==2.50.1
     # via pydantic
 python-multipart==0.0.32
     # via caweb (pyproject.toml)
-starlette==1.6.0
+starlette==1.10.0
     # via fastapi
 typing-extensions==4.16.0
     # via
     #   anyio
     #   fastapi
+    #   opentelemetry-api
     #   pydantic
     #   pydantic-core
     #   typing-inspection
@@ -43,5 +46,5 @@ typing-inspection==0.4.4
     # via
     #   fastapi
     #   pydantic
-uvicorn==0.52.4
+uvicorn==0.54.0
     # via caweb (pyproject.toml)

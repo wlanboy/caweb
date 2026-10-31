@@ -22,13 +22,13 @@ jinja2==3.1.6
     # via caweb
 markupsafe==3.0.4
     # via jinja2
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
     # via fastapi
 pycparser==3.12 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
-pydantic==2.14.1
+pydantic==2.14.2
     # via fastapi
-pydantic-core==2.50.1
+pydantic-core==2.50.2
     # via pydantic
 python-multipart==0.0.32
     # via caweb
